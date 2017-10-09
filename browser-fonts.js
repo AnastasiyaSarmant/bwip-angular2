@@ -23,6 +23,7 @@ module.exports = {
 	onready:onready,
 };
 
+var PUBLIC_URL='./assets';
 // Module globals, wrapped.  The name bwipjs_fonts is known to the font-descriptions.
 var bwipjs_fonts = {
 	monocolor: false,	// aka monochrome
@@ -39,7 +40,7 @@ var bwipjs_fonts = {
 
 	function metrics(id) {
 		var xhr = new XMLHttpRequest;
-		xhr.open('GET', process.env.PUBLIC_URL + '/bwipjs-fonts/fnt' + id + '-desc.js', true);
+		xhr.open('GET', PUBLIC_URL + '/bwipjs-fonts/fnt' + id + '-desc.js', true);
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
 				// The description files always start with //
@@ -80,7 +81,7 @@ function loadfonts(callback) {
 	for (var temp in bwipjs_fonts.toload) {
 		(function(fontpath, font) {
 			var xhr = new XMLHttpRequest;
-			xhr.open('GET', process.env.PUBLIC_URL + '/bwipjs-fonts/' + fontpath, true);
+			xhr.open('GET', PUBLIC_URL + '/bwipjs-fonts/' + fontpath, true);
 			xhr.responseType = 'arraybuffer';
 			xhr.onload = function(e) {
 				if (xhr.status == 200) {
