@@ -23,7 +23,7 @@ export class BarcodeComponent  {
 
   constructor() {
       bwipjs('barcodeCanvas', {
-        bcid: 'datamatrix',       // Barcode type
+        bcid: 'code128',       // Barcode type
         text: '123456789',   	  // Text to encode
         scale: 3,                 // 3x scaling factor
         height: 10,               // Bar height, in millimeters

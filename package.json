@@ -1,6 +1,6 @@
 {
   "name": "bwip-angular2",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "JavaScript barcode generator supporting over 90 types and standards.",
   "main": "node-bwipjs.js",
   "module": "browser-bwipjs.js",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/metafloor/bwip-js.git"
+    "url": "https://github.com/AnastasiyaSarmant/bwip-angular2"
   },
   "keywords": [
     "bar code",
