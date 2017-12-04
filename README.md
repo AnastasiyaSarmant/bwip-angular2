@@ -41,4 +41,4 @@ export class BarcodeComponent  {
 }
 ```
 For more information and barcode options see 
-[Barcode Writer in Pure PostScript](https://github.com/bwipp/postscriptbarcode). 
+[bwip-js](https://github.com/metafloor/bwip-js). 
