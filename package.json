@@ -1,9 +1,8 @@
 {
   "name": "bwip-angular2",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "JavaScript barcode generator supporting over 90 types and standards.",
   "main": "node-bwipjs.js",
-  "module": "browser-bwipjs.js",
   "browser": "browser-bwipjs.js",
   "bin": {
     "bwip-js": "./bin/node-bwipjs.js"
@@ -21,7 +20,7 @@
     "barcode",
     "javascript",
 	"node",
-	"react",
+	"angular2",
 	"browser",
     "itf",
     "gs1",

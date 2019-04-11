@@ -7,7 +7,7 @@
 //
 // 		http://metafloor.github.io/bwip-js
 //
-// Copyright (c) 2011-2017 Mark Warren
+// Copyright (c) 2011-2018 Mark Warren
 //
 // The MIT License
 //
@@ -70,7 +70,20 @@ module.exports = function(rot, bgcolor, opts) {
 	// Background color does not support alpha-channel (the alpha compositing
 	// algorithm used cannot support it...)
 	if (typeof bgcolor === 'string') {
-		bgcolor = (0xff000000 | parseInt(bgcolor, 16)) >>> 0;
+        if (bgcolor.length == 8) {
+			// CMYK
+            var c = parseInt(bgcolor.substr(0,2), 16) / 255;
+            var m = parseInt(bgcolor.substr(2,2), 16) / 255;
+            var y = parseInt(bgcolor.substr(4,2), 16) / 255;
+            var k = parseInt(bgcolor.substr(6,2), 16) / 255;
+            var r = Math.floor((1-c) * (1-k) * 255);
+            var g = Math.floor((1-m) * (1-k) * 255);
+            var b = Math.floor((1-y) * (1-k) * 255);
+			bgcolor = (0xff000000 | (r << 16) | (g << 8) | b) >>> 0;
+		} else {
+			// RGB
+			bgcolor = (0xff000000 | parseInt(bgcolor, 16)) >>> 0;
+		}
 	} else if (bgcolor != null) {
 		bgcolor = (0xff000000 | bgcolor) >>> 0;
 	} else {
@@ -306,6 +319,9 @@ module.exports = function(rot, bgcolor, opts) {
 					length += 12 + _palette.length;	// tRNS		
 				}
 			}
+			if (opts.dpi) {
+				length += 12 + 9;	// pHYs
+			}
 
 			// Emulate a byte-stream
 			var png = new Buffer(length);
@@ -314,6 +330,9 @@ module.exports = function(rot, bgcolor, opts) {
 			write('\x89PNG\x0d\x0a\x1a\x0a'); // PNG file header
 			writeIHDR();
 			writeTEXT();
+			if (opts.dpi) {
+				writePHYS();
+			}
 			if (_pngtype == PNGTYPE_PALETTE) {
 				writePLTE();
 				if (_trans) {
@@ -353,6 +372,17 @@ module.exports = function(rot, bgcolor, opts) {
 
 				write('tEXt');
 				write(_text);
+				writeCRC(crcoff);
+			}
+			function writePHYS() {
+				write32(9);
+				var crcoff = pngoff;
+
+				var pxm = ((opts.dpi || 72) / 0.0254)|0;
+				write('pHYs');
+				write32(pxm);	// x-axis
+				write32(pxm);	// y-axis
+				write8(1);		// px/m (the only usable option)
 				writeCRC(crcoff);
 			}
 			function writePLTE() {

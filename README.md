@@ -16,29 +16,33 @@ import bwipjs from 'bwip-angular2';
 
 @Component({
   selector: 'barcode',
-  template: '<canvas id="barcodeCanvas"></canvas><div id="err"></div>',
-  styleUrls: ['./barcode.component.css']
+  template: `<button (click)="renderBarcode()">Click to render</button>
+  <canvas id="barcodeCanvas"></canvas>
+  <div id="err"></div>`,
+  styleUrls: ['./barcode-component.sass']
 })
+
 export class BarcodeComponent  {
 
-  constructor() {
-      bwipjs('barcodeCanvas', {
-        bcid: 'code128',       // Barcode type
-        text: '123456789',   	  // Text to encode
-        scale: 3,                 // 3x scaling factor
-        height: 10,               // Bar height, in millimeters
-        width: 10,
-        includetext: true,        // Show human-readable text
-        textxalign: 'center',      // Always good to set this
-      }, function (err, cvs) {
-        if (err) {
-          document.getElementById('err').innerText = 'Error occured. See browser log for more information';
-          console.log(err);
-        } else {
-        }
-      });
-   }
+  public renderBarcode(): void {
+    bwipjs('barcodeCanvas', {
+      bcid: 'code128',        // Barcode type
+      text: '987654321',   	  // Text to encode
+      scale: 3,               // 3x scaling factor
+      height: 10,             // Bar height, in millimeters
+      width: 10,
+      includetext: true,      // Show human-readable text
+      textxalign: 'center',   // Always good to set this
+    }, (err, cvs) => {
+      if (err) {
+        document.getElementById('err').innerText = 'Error occured. See browser log for more information';
+        console.log(err);
+      } else {
+      }
+    });
+  }
 }
+
 ```
 For more information and barcode options see 
 [bwip-js](https://github.com/metafloor/bwip-js). 

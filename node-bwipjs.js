@@ -1,17 +1,38 @@
 // file: bwip-js/node-bwipjs.js
 //
-// Copyright (c) 2011-2017 Mark Warren
+// This is part of the bwip-js project available at:
 //
-// See the LICENSE file in the bwip-js root directory
-// for the extended copyright notice.
+// 		http://metafloor.github.io/bwip-js
+//
+// Copyright (c) 2011-2018 Mark Warren
+//
+// The MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 "use strict";
 
 var url	= require('url'),
-	bwipp = require(__dirname + '/bwipp'),
-	bwipjs = require(__dirname + '/bwipjs'),
-	Bitmap = require(__dirname + '/node-bitmap'),
-	fixedfont = require(__dirname + '/node-fonts')	// freetype alternative, default
+	bwipp = require('./bwipp'),
+	bwipjs = require('./bwipjs'),
+	Bitmap = require('./node-bitmap'),
+	fixedfont = require('./node-fonts')	// freetype alternative, default
 	;
 
 // freetype is the module, freefont is the font manager interface identical to fixedfont
@@ -35,7 +56,7 @@ module.exports = function(req, res, opts) {
 	module.exports.toBuffer(args, function(err, png) {
 		if (err) {
 			res.writeHead(400, { 'Content-Type':'text/plain' });
-			res.end('' + err, 'ascii');
+			res.end('' + (err.stack || err), 'utf-8');
 		} else {
 			res.writeHead(200, { 'Content-Type':'image/png' });
 			res.end(png, 'binary');
@@ -113,8 +134,8 @@ module.exports.toBuffer = function(args, callback) {
 	}
 
 	// Override the `backgroundcolor` option.
-	if (opts.backgroundcolor) {
-		bw.bitmap(new Bitmap(rot, parseInt(''+opts.backgroundcolor, 16), opts));
+	if (opts.backgroundcolor != null) {
+		bw.bitmap(new Bitmap(rot, opts.backgroundcolor, opts));
 		delete opts.backgroundcolor;
 	} else {
 		bw.bitmap(new Bitmap(rot, null, opts));
@@ -149,8 +170,8 @@ module.exports.toBuffer = function(args, callback) {
 }
 
 module.exports.useFreetype = function(useFT) {
-	if (useFT || useFT === undefined) {
-		freetype = require(__dirname + '/freetype');
+	if (useFT || useFT == null) {
+		freetype = require('./freetype');
 		
 		var ft_monochr	= freetype.cwrap("monochrome", 'number', ['number']);
 		var ft_lookup	= freetype.cwrap("find_font", 'number', ['string']);
@@ -174,7 +195,7 @@ module.exports.useFreetype = function(useFT) {
 				return ft_monochr(enable ? 1 : 0);
 			},
 			getglyph(fontid, charcode, size) {
-				var offset = ft_bitmap(fontid, charcode, width, height);
+				var offset = ft_bitmap(fontid, charcode, size, size);
 				if (offset <= 0) {
 					return { width:0, height:0, top:0, left:0, advance:ft_advance() };
 				}
@@ -184,6 +205,11 @@ module.exports.useFreetype = function(useFT) {
 				}
 			}
 		};
+
+		// Bring in the custom symbol font for maxicode support (and dotcode when that
+		// renderer changes).
+		module.exports.loadFont('Symbol', 100,
+				require('fs').readFileSync(__dirname + '/fonts/BWIPJS-Symbol.otf', 'binary'));
 	} else {
 		freetype = freefont = null;
 	}
@@ -196,7 +222,7 @@ module.exports.loadFont = function(fontname, sizemult, fontfile) {
 										['string','string','number']);
 	var rv = load_font('/' + fontname, fontname, sizemult);
 	if (rv != 0) {
-		freetype.unlink('/' + fontname);
+		freetype.FS_unlink('/' + fontname);
 		throw 'Error: font load failed [' + rv + ']';
 	}
 }
@@ -207,7 +233,7 @@ module.exports.unloadFont = function(fontname) {
 	close_font(fontname);
 
 	// Delete from emscripten
-	freetype.unlink('/' + fontname);
+	freetype.FS_unlink('/' + fontname);
 }
 
 module.exports.bwipjs_version = bwipjs.VERSION;

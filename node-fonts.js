@@ -1,4 +1,32 @@
-// bwip-js/node-fontlib.js
+// bwip-js/node-fonts.js
+//
+// node-js font lib interface
+//
+// This is part of the bwip-js project available at:
+//
+// 		http://metafloor.github.io/bwip-js
+//
+// Copyright (c) 2011-2018 Mark Warren
+//
+// The MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 "use strict";
 
@@ -74,7 +102,11 @@ function getglyph(fontid, charcode, width, height) {
 	if (!font) {
 		// We can avoid this Sync() interface (the browser version does), but
 		// requires more work for the user.
-		var bytes = fs.readFileSync(__dirname + '/fonts/fnt' + fontid +
+		var fontdir = process.env.BWIPJS_FONTS || __dirname + '/fonts';
+		if (fontdir[fontdir.length-1] == '/') {
+			fontdir = fontdir.substr(0, fontdir.length-1);
+		}
+		var bytes = fs.readFileSync(fontdir + '/fnt' + fontid +
 									(monochr ? 'm-' : 'a-') + size + '.bin');
 		fontset.fonts[fkey] = font = { bytes:bytes, glyphs:[] };
 	} 
